@@ -22,7 +22,7 @@ def register():
     if User.query.filter_by(email=email).first():
         return jsonify({'message': 'Email already exists'}), 409
 
-    hashed_password = generate_password_hash(password, method='sha256')
+    hashed_password = generate_password_hash(password)
 
     new_user = User(username=username, email=email, password_hash=hashed_password)
     db.session.add(new_user)
@@ -41,6 +41,6 @@ def login():
     if not user or not check_password_hash(user.password_hash, password):
         return jsonify({'message': 'Invalid username or password'}), 401
 
-    access_token = create_access_token(identity=username, expires_delta=timedelta(days=1))
+    access_token = create_access_token(identity=user.id, expires_delta=timedelta(days=1))
 
     return jsonify({'access_token': access_token}), 200
